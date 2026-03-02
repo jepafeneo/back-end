@@ -20,12 +20,14 @@ const server = http.createServer((req, res) => {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({ message: "API Running" }));
-  }
-
-  if (req.url == "/ping") {
+  } else if (req.url == "/ping") {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({ message: "Pong" }));
+  } else {
+    res.statusCode = 404;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ message: "Not Found" }));
   }
 });
 
