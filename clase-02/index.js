@@ -1,16 +1,86 @@
-import * as http from "node:http";
+import express from "express";
 
-const server = http.createServer((request, response) => {
-  if (request.url == "/ping") {
-    response.statusCode = 200;
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ message: "pong" }));
-    return;
-  }
+const app = express();
 
-  response.statusCode = 404;
-  response.setHeader("Content-Type", "application/json");
-  response.end(JSON.stringify({ error: "Not Found" }));
+const products = [
+  { id: 1, name: "Laptop", price: 1200 },
+  { id: 2, name: "Mouse", price: 20 },
+];
+
+const categories = [
+  {
+    id: 1,
+    name: "Electro",
+    description: "Lorem ipsum",
+  },
+  {
+    id: 2,
+    name: "Bazar",
+    description: "Lorem ipsum bazar",
+  },
+];
+
+app.get("/products", (req, res) => {
+  res.json(products);
 });
 
-server.listen(3000, () => console.log("http://localhost:3000"));
+app.get("/products/:id", (req, res) => {
+  // const id = Number(req.params.id);
+  const id = parseInt(req.params.id);
+
+  // console.log(typeof req.params.id, typeof id, id, isNaN(id));
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "Invalid id" });
+  }
+
+  const product = products.find((p) => p.id == id);
+
+  if (!product) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  res.json(product);
+});
+
+app.get("/categories", (req, res) => {
+  res.json(categories);
+});
+
+// app.get("/categorias/:id", (req, res) => {
+//   const id = parseInt(req.params.id);
+
+//   if (isNaN(id)) {
+//     return res.status(400).json({ error: "Error de usuario" });
+//   }
+
+//   const categoria = categories.find((cat) => cat.id == id);
+
+//   if (!categoria) {
+//     return res.status(404).json({ error: "ERROR" }); // esto es el error 404 (no se encuentra)
+//   }
+
+//   res.json(categoria);
+// });
+
+app.get("/categories/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "Invalid category" });
+  }
+
+  const category = categories.find((cat) => cat.id == id);
+
+  if (!category) {
+    return res.status(404).json({ error: "category not found" });
+  }
+
+  res.json(category);
+});
+
+app.get("/ping", (req, res) => {
+  res.json({ message: "pong" });
+});
+
+app.listen(3000, () => console.log("http://localhost:3000"));
