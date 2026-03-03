@@ -2,6 +2,8 @@ import express from "express";
 
 const app = express();
 
+app.use(express.json());
+
 const products = [
   { id: 1, name: "Laptop", price: 1200 },
   { id: 2, name: "Mouse", price: 20 },
@@ -43,6 +45,22 @@ app.get("/products/:id", (req, res) => {
   res.json(product);
 });
 
+app.post("/products", (req, res) => {
+  // console.log(req.body);
+
+  // console.log(Date.now());
+
+  const newProduct = {
+    id: Date.now(),
+    name: req.body.name,
+    price: req.body.price,
+  };
+
+  products.push(newProduct);
+
+  res.status(201).json(newProduct);
+});
+
 app.get("/categories", (req, res) => {
   res.json(categories);
 });
@@ -63,20 +81,103 @@ app.get("/categories", (req, res) => {
 //   res.json(categoria);
 // });
 
+// app.get("/categories/:id", (req, res) => {
+//   const id = parseInt(req.params.id);
+
+//   if (isNaN(id)) {
+//     return res.status(400).json({ error: "Invalid category" });
+//   }
+
+//   const category = categories.find((cat) => cat.id == id);
+
+//   if (!category) {
+//     return res.status(404).json({ error: "category not found" });
+//   }
+
+//   res.json(category);
+// });
+
 app.get("/categories/:id", (req, res) => {
   const id = parseInt(req.params.id);
 
   if (isNaN(id)) {
-    return res.status(400).json({ error: "Invalid category" });
+    return res.status(400).json({ message: "Invalid ID" });
   }
 
-  const category = categories.find((cat) => cat.id == id);
+  const category = categories.find((c) => c.id == req.params.id);
 
   if (!category) {
-    return res.status(404).json({ error: "category not found" });
+    return res.status(404).json({ message: "Category not found" });
   }
 
   res.json(category);
+});
+
+// app.post("/categorias", (req, res) => {
+//   // console.log(req.body);
+//   // res.send("ok");
+//   const newCategory = {
+//     id: Date.now(),
+//     name: req.body.name,
+//   };
+
+//   categories.push(newCategory);
+
+//   res.status(201).json(newCategory);
+// });
+
+// app.post("/categories", (req, res) => {
+//   const newCategory = {
+//     id: Date.now(),
+//     name: req.body.name,
+//     description: req.body.description,
+//   };
+
+//   categories.push(newCategory);
+
+//   res.status(201).json(newCategory);
+// });
+
+// app.post("/categories", (req, res) => {
+//   //console.log(req.body);
+//   const newCategory = {
+//     id: Date.now(),
+//     name: req.body.name,
+//   };
+
+//   categories.push(newCategory);
+
+//   res.status(201).json(newCategory);
+// });
+
+app.post("/categories", (req, res) => {
+  console.log(req.body, req.body.name);
+
+  // if (!req.body.name) {
+  //   return res.status(422).json({ error: "name is required" });
+  // }
+
+  // if (req.body.name == undefined) {
+  //   return res.status(422).json({ error: "name is required" });
+  // }
+
+  // if (req.body.name == "") {
+  //   return res.status(422).json({ error: "name is required" });
+  // }
+
+  if (req.body.name == undefined || req.body.name == "") {
+    return res.status(422).json({ error: "name is required" });
+  }
+
+  const newCategory = {
+    id: Date.now(),
+    name: req.body.name,
+    description: req.body.description,
+  };
+
+  categories.push(newCategory);
+
+  res.status(201).json(newCategory);
 });
 
 app.get("/ping", (req, res) => {
