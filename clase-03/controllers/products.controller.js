@@ -1,3 +1,5 @@
+import { validateStock, validatePrice } from "../utils/validate.js";
+
 const products = [
   { id: 1, name: "Laptop", price: 1200, stock: 10 },
   { id: 2, name: "Mouse", price: 20, stock: 50 },
@@ -24,12 +26,27 @@ export const getProductById = (req, res) => {
 };
 
 export const createProduct = (req, res) => {
-  if (
-    req.body.stock == undefined ||
-    isNaN(req.body.stock) ||
-    req.body.stock < 0
-  ) {
+  // console.log(!validateStock(req.body.stock));
+
+  // if (
+  //   req.body.stock == undefined ||
+  //   isNaN(req.body.stock) ||
+  //   req.body.stock < 0
+  // ) {
+  //   return res.status(422).json({ error: "Invalid stock" });
+  // }
+
+  if (!validateStock(req.body.stock)) {
     return res.status(422).json({ error: "Invalid stock" });
+  }
+
+  // console.log(validatePrice(req.body.price));
+  // Validación del campo price
+  // if (!req.body.price || req.body.price < 0) {
+  //   return res.status(422).json({ error: "Invalid price" });
+  // }
+  if (!validatePrice(req.body.price)) {
+    return res.status(422).json({ error: "Invalid price" });
   }
 
   const newProduct = {
