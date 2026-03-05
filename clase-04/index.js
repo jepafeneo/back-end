@@ -7,11 +7,6 @@ const app = express();
 
 app.use(express.json());
 
-// app.post("/products", (req, res) => {
-//   console.log(req.body);
-//   res.json({ success: true });
-// });
-
 app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);
 app.use(pingRouter);
