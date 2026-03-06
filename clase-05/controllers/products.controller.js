@@ -108,3 +108,23 @@ export const deleteProduct = (req, res) => {
 
   res.status(204).send();
 };
+
+export const searchProduct = async (req, res) => {
+  const { name } = req.query;
+
+  if (!name) {
+    return res.status(422).json({ error: "Name is required" });
+  }
+
+  const products = await Product.find({
+    name: { $regex: name, $options: "i" },
+  });
+
+  res.json(products);
+
+  // const filtrados = products.filter((p) =>
+  //   p.name.toLowerCase().includes(name.toLowerCase()),
+  // );
+
+  // res.json(filtrados);
+};
