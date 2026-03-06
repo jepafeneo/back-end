@@ -1,3 +1,5 @@
+import Category from "../models/Category.js";
+
 const categories = [
   {
     id: 1,
@@ -11,7 +13,12 @@ const categories = [
   },
 ];
 
-export const getCategories = (req, res) => {
+// export const getCategories = (req, res) => {
+//   res.json(categories);
+// };
+
+export const getCategories = async (req, res) => {
+  const categories = await Category.find();
   res.json(categories);
 };
 
