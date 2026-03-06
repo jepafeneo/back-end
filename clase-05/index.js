@@ -11,8 +11,6 @@ import pingRouter from "./routes/ping.router.js";
 
 const app = express();
 
-// console.log(process.env.MONGODB_URI);
-
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
