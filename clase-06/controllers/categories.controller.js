@@ -22,36 +22,36 @@ export const getCategories = async (req, res) => {
   res.json(categories);
 };
 
-export const getCategoryById = (req, res) => {
-  const id = Number(req.params.id);
+export const getCategoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  if (Number.isNaN(id)) {
-    return res.status(400).json({ message: "Invalid ID" });
+    const category = await Category.findById(id);
+
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    return res.json(category);
+  } catch (error) {
+    return res.status(400).json({ message: "Invalid category ID" });
   }
-
-  const category = categories.find((c) => c.id == id);
-
-  if (!category) {
-    return res.status(404).json({ message: "Category not found" });
-  }
-
-  res.json(category);
 };
 
-export const createCategory = (req, res) => {
+export const createCategory = async (req, res) => {
   if (!req.body.name) {
-    return res.status(422).json({ error: "name is required" });
+    return res.status(422).json({ error: "No tiene nombre" });
   }
 
-  const newCategory = {
-    id: Date.now(),
+  const data = {
     name: req.body.name,
     description: req.body.description,
   };
 
-  categories.push(newCategory);
+  const category = new Category(data);
+  await category.save();
 
-  res.status(201).json(newCategory);
+  res.status(201).json(category);
 };
 
 export const updateCategory = (req, res) => {

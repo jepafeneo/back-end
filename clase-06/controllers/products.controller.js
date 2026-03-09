@@ -51,41 +51,51 @@ export const createProduct = async (req, res) => {
   res.status(201).json(product);
 };
 
-export const updateProduct = (req, res) => {
-  const id = Number(req.params.id);
+// export const updateProduct = (req, res) => {
+//   const id = Number(req.params.id);
 
-  if (isNaN(id)) {
-    return res.status(400).json({ error: "Invalid id" });
-  }
+//   if (isNaN(id)) {
+//     return res.status(400).json({ error: "Invalid id" });
+//   }
 
-  const product = products.find((p) => p.id == id);
+//   const product = products.find((p) => p.id == id);
 
-  if (!product) {
-    return res.status(404).json({ error: "Product not found" });
-  }
+//   if (!product) {
+//     return res.status(404).json({ error: "Product not found" });
+//   }
 
-  // console.log(product);
-  // console.log(req.body);
+//   // console.log(product);
+//   // console.log(req.body);
 
-  if (!validateStock(req.body.stock)) {
-    return res.status(422).json({ error: "Invalid stock" });
-  }
+//   if (!validateStock(req.body.stock)) {
+//     return res.status(422).json({ error: "Invalid stock" });
+//   }
 
-  if (!validatePrice(req.body.price)) {
-    return res.status(422).json({ error: "Invalid price" });
-  }
+//   if (!validatePrice(req.body.price)) {
+//     return res.status(422).json({ error: "Invalid price" });
+//   }
 
-  const { name, price, stock } = req.body;
+//   const { name, price, stock } = req.body;
 
-  // console.log(name, price, stock);
+//   // console.log(name, price, stock);
 
-  product.name = name;
-  product.price = Number(price);
-  product.stock = Number(stock);
+//   product.name = name;
+//   product.price = Number(price);
+//   product.stock = Number(stock);
 
-  // console.log(product);
+//   // console.log(product);
 
-  res.json(product);
+//   res.json(product);
+// };
+
+export const updateProduct = async (req, res) => {
+  const { id } = req.params;
+
+  const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
+
+  res.json(productUpdate);
 };
 
 export const deleteProduct = (req, res) => {
