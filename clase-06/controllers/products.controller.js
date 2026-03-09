@@ -88,14 +88,34 @@ export const createProduct = async (req, res) => {
 //   res.json(product);
 // };
 
+// export const updateProduct = async (req, res) => {
+//   const { id } = req.params;
+
+//   console.log(req.body);
+
+//   const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
+//     new: true,
+//   });
+
+//   res.json(productUpdate);
+// };
+
 export const updateProduct = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
-    new: true,
-  });
+    const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
+      returnDocument: "after",
+    });
 
-  res.json(productUpdate);
+    if (!productUpdate) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json(productUpdate);
+  } catch (error) {
+    res.status(404).json({ error: "Invalid product id" });
+  }
 };
 
 export const deleteProduct = (req, res) => {
