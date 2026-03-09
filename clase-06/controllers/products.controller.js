@@ -51,58 +51,17 @@ export const createProduct = async (req, res) => {
   res.status(201).json(product);
 };
 
-// export const updateProduct = (req, res) => {
-//   const id = Number(req.params.id);
-
-//   if (isNaN(id)) {
-//     return res.status(400).json({ error: "Invalid id" });
-//   }
-
-//   const product = products.find((p) => p.id == id);
-
-//   if (!product) {
-//     return res.status(404).json({ error: "Product not found" });
-//   }
-
-//   // console.log(product);
-//   // console.log(req.body);
-
-//   if (!validateStock(req.body.stock)) {
-//     return res.status(422).json({ error: "Invalid stock" });
-//   }
-
-//   if (!validatePrice(req.body.price)) {
-//     return res.status(422).json({ error: "Invalid price" });
-//   }
-
-//   const { name, price, stock } = req.body;
-
-//   // console.log(name, price, stock);
-
-//   product.name = name;
-//   product.price = Number(price);
-//   product.stock = Number(stock);
-
-//   // console.log(product);
-
-//   res.json(product);
-// };
-
-// export const updateProduct = async (req, res) => {
-//   const { id } = req.params;
-
-//   console.log(req.body);
-
-//   const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
-//     new: true,
-//   });
-
-//   res.json(productUpdate);
-// };
-
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!validateStock(req.body.stock)) {
+      return res.status(422).json({ error: "Invalid stock" });
+    }
+
+    if (!validatePrice(req.body.price)) {
+      return res.status(422).json({ error: "Invalid price" });
+    }
 
     const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
       returnDocument: "after",
@@ -118,23 +77,39 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-export const deleteProduct = (req, res) => {
-  const id = Number(req.params.id);
+// export const deleteProduct = (req, res) => {
+//   const id = Number(req.params.id);
 
-  if (Number.isNaN(id)) {
-    return res.status(400).json({ error: " Invalid ID" });
+//   if (Number.isNaN(id)) {
+//     return res.status(400).json({ error: " Invalid ID" });
+//   }
+
+//   const productIndex = products.findIndex((p) => p.id == id);
+
+//   // if (productIndex < 0) {
+//   if (productIndex == -1) {
+//     return res.status(404).json({ error: "Product not found" });
+//   }
+
+//   products.splice(productIndex, 1);
+
+//   res.status(204).send();
+// };
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const productDelete = await Product.findByIdAndDelete(id);
+
+    if (!productDelete) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(404).json({ error: "Invalid product id" });
   }
-
-  const productIndex = products.findIndex((p) => p.id == id);
-
-  // if (productIndex < 0) {
-  if (productIndex == -1) {
-    return res.status(404).json({ error: "Product not found" });
-  }
-
-  products.splice(productIndex, 1);
-
-  res.status(204).send();
 };
 
 export const searchProduct = async (req, res) => {

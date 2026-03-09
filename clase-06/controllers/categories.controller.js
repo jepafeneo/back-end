@@ -54,45 +54,58 @@ export const createCategory = async (req, res) => {
   res.status(201).json(category);
 };
 
-export const updateCategory = (req, res) => {
-  const id = Number(req.params.id);
+export const updateCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  if (Number.isNaN(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
+    if (!req.body.name) {
+      return res.status(422).json({ error: "Name required" });
+    }
+
+    const categoryUpdate = await Category.findByIdAndUpdate(id, req.body, {
+      returnDocument: "after",
+    });
+
+    if (!categoryUpdate) {
+      return res.status(404).json({ error: "Categoría no encontrada" });
+    }
+
+    res.json(categoryUpdate);
+  } catch (error) {
+    return res.status(404).json({ error: "Categoría no válida" });
   }
-
-  const category = categories.find((c) => c.id == id);
-
-  if (!category) {
-    return res.status(404).json({ error: "Category not found" });
-  }
-
-  const { name, description } = req.body;
-
-  if (!name) {
-    return res.status(422).json({ error: "Name required" });
-  }
-
-  category.name = name;
-  category.description = description;
-
-  res.json(category);
 };
 
-export const deleteCategory = (req, res) => {
-  const id = Number(req.params.id);
+// export const deleteCategory = (req, res) => {
+//   const id = Number(req.params.id);
 
-  if (Number.isNaN(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
+//   if (Number.isNaN(id)) {
+//     return res.status(400).json({ error: "Invalid ID" });
+//   }
+
+//   const categoryIndex = categories.findIndex((c) => c.id == id);
+
+//   if (categoryIndex == -1) {
+//     return res.status(404).json({ error: "Category not found" });
+//   }
+
+//   categories.splice(categoryIndex, 1);
+
+//   res.status(204).send();
+// };
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const categoryDelete = await Category.findByIdAndDelete(id);
+
+    if (!categoryDelete) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(404).json({ error: "Id de al categoría no válido" });
   }
-
-  const categoryIndex = categories.findIndex((c) => c.id == id);
-
-  if (categoryIndex == -1) {
-    return res.status(404).json({ error: "Category not found" });
-  }
-
-  categories.splice(categoryIndex, 1);
-
-  res.status(204).send();
 };
