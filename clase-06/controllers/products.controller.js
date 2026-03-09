@@ -2,11 +2,6 @@ import { validateStock, validatePrice } from "../utils/validators.js";
 
 import Product from "../models/Product.js";
 
-const products = [
-  { id: 1, name: "Laptop", price: 1200, stock: 10 },
-  { id: 2, name: "Mouse", price: 20, stock: 50 },
-];
-
 export const getProducts = async (req, res) => {
   const products = await Product.find();
   res.json(products);
@@ -18,7 +13,7 @@ export const getProductById = async (req, res) => {
     const { id } = req.params;
 
     const product = await Product.findById(id);
-    console.log(product);
+    // console.log(product);
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -77,25 +72,6 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// export const deleteProduct = (req, res) => {
-//   const id = Number(req.params.id);
-
-//   if (Number.isNaN(id)) {
-//     return res.status(400).json({ error: " Invalid ID" });
-//   }
-
-//   const productIndex = products.findIndex((p) => p.id == id);
-
-//   // if (productIndex < 0) {
-//   if (productIndex == -1) {
-//     return res.status(404).json({ error: "Product not found" });
-//   }
-
-//   products.splice(productIndex, 1);
-
-//   res.status(204).send();
-// };
-
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -124,10 +100,4 @@ export const searchProduct = async (req, res) => {
   });
 
   res.json(products);
-
-  // const filtrados = products.filter((p) =>
-  //   p.name.toLowerCase().includes(name.toLowerCase()),
-  // );
-
-  // res.json(filtrados);
 };
