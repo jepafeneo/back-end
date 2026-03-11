@@ -17,7 +17,11 @@ export const getCategoryById = async (req, res) => {
 
     return res.json(category);
   } catch (error) {
-    return res.status(400).json({ message: "Invalid category ID" });
+    if (error.name == "CastError") {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -38,7 +42,7 @@ export const createCategory = async (req, res) => {
     res.status(201).json(category);
   } catch (error) {
     if (error.name == "ValidationError") {
-      return res.status(422).json({ error: error.message });
+      return res.status(422).json({ error: error.errors });
     }
 
     res.status(500).json({ error: "Error al crear categoría" });
@@ -49,12 +53,13 @@ export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!req.body.name) {
-      return res.status(422).json({ error: "Name required" });
-    }
+    // if (!req.body.name) {
+    //   return res.status(422).json({ error: "Name required" });
+    // }
 
     const categoryUpdate = await Category.findByIdAndUpdate(id, req.body, {
       returnDocument: "after",
+      runValidators: true,
     });
 
     if (!categoryUpdate) {
@@ -63,7 +68,21 @@ export const updateCategory = async (req, res) => {
 
     res.json(categoryUpdate);
   } catch (error) {
-    return res.status(404).json({ error: "Categoría no válida" });
+    if (error.name == "ValidationError") {
+      const errors = {};
+
+      for (const property in error.errors) {
+        errors[property] = error.errors[property].message;
+      }
+
+      return res.status(422).json({ error: errors });
+    }
+
+    if (error.name == "CastError") {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -79,6 +98,10 @@ export const deleteCategory = async (req, res) => {
 
     res.status(204).send();
   } catch (error) {
-    res.status(404).json({ error: "Id de al categoría no válido" });
+    if (error.name == "CastError") {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    res.status(500).json({ error: "Server error" });
   }
 };

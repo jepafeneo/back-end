@@ -47,7 +47,19 @@ export const createProduct = async (req, res) => {
     res.status(201).json(product);
   } catch (error) {
     if (error.name == "ValidationError") {
-      return res.status(422).json({ error: error.message });
+      // console.log(error.errors);
+
+      const errors = {};
+
+      for (const property in error.errors) {
+        // console.log(property, error.errors[property].message);
+        errors[property] = error.errors[property].message;
+      }
+
+      // console.log(errors);
+
+      // return res.status(422).json({ error: error.errors });
+      return res.status(422).json({ error: errors });
     }
 
     res.status(500).json({ error: "Internal server error" });
@@ -58,16 +70,17 @@ export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!validateStock(req.body.stock)) {
-      return res.status(422).json({ error: "Invalid stock" });
-    }
+    // if (!validateStock(req.body.stock)) {
+    //   return res.status(422).json({ error: "Invalid stock" });
+    // }
 
-    if (!validatePrice(req.body.price)) {
-      return res.status(422).json({ error: "Invalid price" });
-    }
+    // if (!validatePrice(req.body.price)) {
+    //   return res.status(422).json({ error: "Invalid price" });
+    // }
 
     const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
       returnDocument: "after",
+      runValidators: true,
     });
 
     if (!productUpdate) {
@@ -76,7 +89,15 @@ export const updateProduct = async (req, res) => {
 
     res.json(productUpdate);
   } catch (error) {
-    res.status(404).json({ error: "Invalid product id" });
+    if (error.name == "ValidationError") {
+      return res.status(422).json({ error: error.errors });
+    }
+
+    if (error.name == "CastError") {
+      return res.status(400).json({ error: "Invalid id" });
+    }
+
+    res.status(500).json({ error: "Error interno" });
   }
 };
 
