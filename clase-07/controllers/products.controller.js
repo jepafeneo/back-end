@@ -50,7 +50,7 @@ export const createProduct = async (req, res) => {
       return res.status(422).json({ error: error.message });
     }
 
-    res.status(500).json({ error: "error interno" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
