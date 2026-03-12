@@ -23,6 +23,11 @@ const productSchema = new mongoose.Schema(
         message: "Stock must be an integer",
       },
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
   },
   {
     timestamps: true,

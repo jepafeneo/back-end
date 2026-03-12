@@ -1,8 +1,9 @@
 import Product from "../models/Product.js";
+import Category from "../models/Category.js";
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().populate("category", "name");
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
@@ -13,7 +14,7 @@ export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate("category");
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -27,6 +28,14 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
+    const { category: categoryId } = req.body;
+
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
     const product = new Product(req.body);
     await product.save();
 
@@ -49,6 +58,12 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const category = await Category.findById(req.body.category);
+
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
 
     const productUpdate = await Product.findByIdAndUpdate(id, req.body, {
       returnDocument: "after",
