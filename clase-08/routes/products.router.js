@@ -9,6 +9,7 @@ import {
   updateProduct,
   deleteProduct,
   searchProduct,
+  getProductsByCategoryId,
 } from "../controllers/products.controller.js";
 
 router.get("/search", searchProduct);
@@ -20,5 +21,7 @@ router.post("/", createProduct);
 router.put("/:id", updateProduct);
 
 router.delete("/:id", deleteProduct);
+
+router.get("/category/:categoryId", getProductsByCategoryId);
 
 export default router;

@@ -117,3 +117,21 @@ export const searchProduct = async (req, res) => {
 
   res.json(products);
 };
+
+export const getProductsByCategoryId = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const products = await Product.find({ category: categoryId }).populate(
+      "category",
+    );
+
+    res.json(products);
+  } catch (error) {
+    if (error.name == "CastError") {
+      return res.status(400).json({ error: "Invalid categoryId" });
+    }
+
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
