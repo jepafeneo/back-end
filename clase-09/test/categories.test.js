@@ -12,5 +12,21 @@ describe("Categories endpoint", () => {
     expect(res.body).to.be.an("array");
   });
 
-  
+  it("should return name categories ", async function () {
+    const res = await request(app).get("/categories");
+
+    expect(res.body[0]).to.have.property("name");
+  });
+
+  it("should create a new category and return it with a 201 status", async function () {
+    const newCategory = {
+      name: "Books",
+      description: "All kinds of books",
+    };
+    const response = await request(app).post("/categories").send(newCategory);
+    
+    expect(response.status).to.equal(201);
+    expect(response.body).to.have.property("name");
+    expect(response.body.name).to.equal("Books");
+  });
 });
