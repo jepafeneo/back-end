@@ -74,4 +74,60 @@ describe("Categories endpoint", () => {
     expect(response.body).to.have.property("name");
     expect(response.body.name).to.equal("Electronics");
   });
+
+  it("Debería retornar 422 si no tiene nombre", async function () {
+    const res = await request(app).post("/categories").send({});
+
+    expect(res.status).to.equal(422);
+  });
+
+  // it("Debería actualizar una categoría", async function () {
+  //   const category = await Category.findOne();
+
+  //   category.name = "Categoría actualizada";
+  //   console.log(category);
+
+  //   const res = await request(app)
+  //     .put(`/categories/${category.id}`)
+  //     .send(category);
+
+  //   expect(res.status).to.equal(200);
+  //   expect(res.body.name).to.equal("Categoría actualizada");
+  // });
+
+  // it("Debería actualizar una categoria", async function () {
+  //   const category = await Category.findOne({ name: "Electronics" });
+
+  //   category.name = "Analógicos";
+  //   // console.log(category);
+
+  //   const res = await request(app)
+  //     .put(`/categories/${category.id}`)
+  //     .send(category);
+
+  //   expect(res.body.name).to.equal("Analógicos");
+  // });
+
+  it("Debería actualizar una categoría", async function () {
+    const category = await Category.findOne();
+
+    const updatedCategory = {
+      name: "Categoría actualizada",
+    };
+
+    const res = await request(app)
+      .put(`/categories/${category._id}`)
+      .send(updatedCategory);
+
+    expect(res.status).to.equal(200);
+    expect(res.body.name).to.equal("Categoría actualizada");
+  });
+
+  it("Debería borrar una categoria", async function () {
+    const category = await Category.findOne();
+
+    const res = await request(app).delete(`/categories/${category._id}`);
+
+    expect(res.status).to.equal(204);
+  });
 });

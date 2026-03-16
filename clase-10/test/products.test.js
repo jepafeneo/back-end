@@ -83,4 +83,31 @@ describe("Products endpoint", function () {
 
     expect(res.status).to.equal(422);
   });
+
+  it("Debería actualizar un producto", async function () {
+    const product = await Product.findOne();
+
+    // product.name = "Mouse Gammer";
+    // console.log(product);
+
+    const updateProduct = {
+      name: "Mouse Gammer",
+      category: product.category,
+    };
+
+    const res = await request(app)
+      .put(`/products/${product.id}`)
+      .send(updateProduct);
+
+    expect(res.status).to.equal(200);
+    expect(res.body.name).to.equal("Mouse Gammer");
+  });
+
+  it("Debería borra un producto", async function () {
+    const product = await Product.findOne();
+
+    const res = await request(app).delete(`/products/${product.id}`);
+
+    expect(res.status).to.equal(204);
+  });
 });
