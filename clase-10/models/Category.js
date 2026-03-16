@@ -13,6 +13,9 @@ const categorySchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // type: {
+    // ...
+    // },
   },
   {
     timestamps: true,
