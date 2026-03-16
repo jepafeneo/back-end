@@ -44,6 +44,8 @@ describe("Products endpoint", function () {
   it("Debería crear un producto", async function () {
     const category = await Category.findOne({ name: "Electronics" });
 
+    // console.log(category.id, category._id);
+
     const newProduct = {
       name: "Notebook",
       price: 1000,
@@ -66,5 +68,19 @@ describe("Products endpoint", function () {
     expect(response.status).to.equal(200);
     expect(response.body).to.have.property("name");
     expect(response.body.name).to.equal("Mouse");
+  });
+
+  it("Debería devolver 422 si falta el nombre", async function () {
+    const category = await Category.findOne();
+
+    const newProduct = {
+      price: 100,
+      stock: 5,
+      category: category.id,
+    };
+
+    const res = await request(app).post("/products").send(newProduct);
+
+    expect(res.status).to.equal(422);
   });
 });
