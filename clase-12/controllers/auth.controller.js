@@ -31,7 +31,7 @@ export const register = async (req, res) => {
         .json({ error: "Contraseña muy corta, mínimo 6 caracteres" });
     }
 
-    const existingUser = User.findOne({ email });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return res.status(400).json({ error: "Usuario duplicado" });
