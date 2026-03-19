@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -18,7 +19,25 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
+    if (password.length < 5) {
+      return res
+        .status(400)
+        .json({ error: "Contraseña muy corta, mínimo 6 caracteres" });
+    }
+
     const user = await User.findOne({ email });
+
+    // console.log(user);
 
     if (!user) {
       return res.status(400).json({ error: "Invalid credentials" });
@@ -36,6 +55,7 @@ export const login = async (req, res) => {
 
     res.json({ token });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
