@@ -15,11 +15,17 @@ const createToken = (user) => {
   return token;
 };
 
-export const profile = (req, res) => {
-  res.json({
-    message: "Perfil del usuario",
-    user: req.user,
-  });
+export const profile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    res.json({
+      message: "Perfil del usuario",
+      user: user,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 export const login = async (req, res) => {

@@ -11,6 +11,9 @@ import {
   getCategoryProducts,
 } from "../controllers/categories.controller.js";
 
+import { authMiddleware } from "../middlewares/auth.middleware.js";
+
+// router.get("/", authMiddleware, getCategories);
 router.get("/", getCategories);
 router.get("/:id", getCategoryById);
 router.post("/", createCategory);
