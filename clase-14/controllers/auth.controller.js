@@ -15,6 +15,13 @@ const createToken = (user) => {
   return token;
 };
 
+export const profile = (req, res) => {
+  res.json({
+    message: "Perfil del usuario",
+    user: req.user,
+  });
+};
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
