@@ -80,6 +80,16 @@ export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (product.owner.toString() != req.user.id) {
+      return res.status(403).json({ error: "Not allowed" });
+    }
+
     const category = await Category.findById(req.body.category);
 
     if (!category) {
@@ -91,12 +101,14 @@ export const updateProduct = async (req, res) => {
       runValidators: true,
     });
 
-    if (!productUpdate) {
-      return res.status(404).json({ error: "Product not found" });
-    }
+    // if (!productUpdate) {
+    //   return res.status(404).json({ error: "Product not found" });
+    // }
 
     res.json(productUpdate);
   } catch (error) {
+    // console.log(error);
+
     if (error.name == "ValidationError") {
       return res.status(422).json({ error: error.errors });
     }
@@ -113,11 +125,23 @@ export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const productDelete = await Product.findByIdAndDelete(id);
+    const product = await Product.findById(id);
 
-    if (!productDelete) {
+    if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
+
+    if (product.owner.toString() != req.user.id) {
+      return res.status(403).json({ error: "Not allowed" });
+    }
+
+    await product.deleteOne({ _id: id });
+
+    // const productDelete = await Product.findByIdAndDelete(id);
+
+    // if (!productDelete) {
+    //   return res.status(404).json({ error: "Product not found" });
+    // }
 
     res.status(204).send();
   } catch (error) {
@@ -143,4 +167,10 @@ export const getProductsByCategory = async (req, res) => {
 
     res.status(500).json({ error: "Internal server error" });
   }
+};
+
+export const getProductsByOwner = async (req, res) => {
+  const products = await Product.find({ owner: req.user.id });
+
+  res.json(products);
 };
