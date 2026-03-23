@@ -8,7 +8,7 @@ import productsRouter from "./routes/products.router.js";
 import categoriesRouter from "./routes/categories.router.js";
 import authRouter from "./routes/auth.router.js";
 import pingRouter from "./routes/ping.router.js";
-import { authMiddleware } from "./middlewares/auth.middleware.js";
+// import { authMiddleware } from "./middlewares/auth.middleware.js";
 
 const app = express();
 

@@ -3,9 +3,13 @@ import Category from "../models/Category.js";
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("category");
+    const products = await Product.find()
+      .populate("category", "name")
+      .populate("owner", "email");
+
     res.json(products);
   } catch (error) {
+    // console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -38,7 +42,24 @@ export const createProduct = async (req, res) => {
       return res.status(404).json({ error: "Category not found" });
     }
 
-    const product = new Product(req.body);
+    // console.log(req.body, req.user);
+
+    // const data = {
+    //   name: req.body.name,
+    //   price: req.body.price,
+    //   stock: req.body.stock,
+    //   category: req.body.category,
+    //   owner: req.user.id,
+    // };
+
+    const data = {
+      ...req.body,
+      owner: req.user.id,
+    };
+
+    // console.log(data);
+
+    const product = new Product(data);
     await product.save();
 
     res.status(201).json(product);
@@ -123,4 +144,3 @@ export const getProductsByCategory = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
