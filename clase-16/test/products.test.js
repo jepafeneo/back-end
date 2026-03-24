@@ -1,14 +1,25 @@
 import { expect } from "chai";
 import request from "supertest";
 import app from "../app.js";
+import bcrypt from "bcryptjs";
 
 import Category from "../models/Category.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 
 describe("Products endpoint", function () {
   this.timeout(10000);
 
   beforeEach(async function () {
+    await User.deleteMany({});
+
+    const hash = await bcrypt.hash("123456", 10);
+
+    const user = await User.create({
+      email: "test@example.com",
+      password: hash,
+    });
+
     await Category.deleteMany({});
 
     const category = await Category.create({
@@ -22,6 +33,7 @@ describe("Products endpoint", function () {
       price: 80,
       stock: 10,
       category: category._id,
+      owner: user.id,
     });
   });
 
@@ -58,10 +70,20 @@ describe("Products endpoint", function () {
   });
 
   it("Debería crear un producto", async function () {
+    // Login para obtener el token
+    const login = await request(app).post("/auth/login").send({
+      email: "test@example.com",
+      password: "123456",
+    });
+
+    // console.log(login.status, login.body.token);
+
+    // Buscamos una categoría
     const category = await Category.findOne({ name: "Electronics" });
 
     // console.log(category.id, category._id);
 
+    // Creamos el body
     const newProduct = {
       name: "Notebook",
       price: 1000,
@@ -69,7 +91,11 @@ describe("Products endpoint", function () {
       category: category.id,
     };
 
-    const res = await request(app).post("/products").send(newProduct);
+    // Hacemos la petición con el body y el Header Authorization
+    const res = await request(app)
+      .post("/products")
+      .send(newProduct)
+      .set("Authorization", "Bearer " + login.body.token);
 
     expect(res.status).to.equal(201);
     expect(res.body).to.have.property("name");
@@ -104,6 +130,11 @@ describe("Products endpoint", function () {
   });
 
   it("Debería devolver 422 si falta el nombre", async function () {
+    const login = await request(app).post("/auth/login").send({
+      email: "test@example.com",
+      password: "123456",
+    });
+
     const category = await Category.findOne();
 
     const newProduct = {
@@ -112,12 +143,20 @@ describe("Products endpoint", function () {
       category: category.id,
     };
 
-    const res = await request(app).post("/products").send(newProduct);
+    const res = await request(app)
+      .post("/products")
+      .send(newProduct)
+      .set("Authorization", `Bearer ${login.body.token}`);
 
     expect(res.status).to.equal(422);
   });
 
   it("Debería actualizar un producto", async function () {
+    const login = await request(app).post("/auth/login").send({
+      email: "test@example.com",
+      password: "123456",
+    });
+
     const product = await Product.findOne();
 
     const updateProduct = {
@@ -127,16 +166,24 @@ describe("Products endpoint", function () {
 
     const res = await request(app)
       .put(`/products/${product.id}`)
-      .send(updateProduct);
+      .send(updateProduct)
+      .set("Authorization", `Bearer ${login.body.token}`);
 
     expect(res.status).to.equal(200);
     expect(res.body.name).to.equal("Mouse Gammer");
   });
 
   it("Debería borra un producto", async function () {
+    const login = await request(app).post("/auth/login").send({
+      email: "test@example.com",
+      password: "123456",
+    });
+
     const product = await Product.findOne();
 
-    const res = await request(app).delete(`/products/${product.id}`);
+    const res = await request(app)
+      .delete(`/products/${product.id}`)
+      .set("Authorization", `Bearer ${login.body.token}`);
 
     expect(res.status).to.equal(204);
   });
@@ -213,5 +260,41 @@ describe("Products endpoint", function () {
     expect(res.body[0]).to.have.property("category");
     expect(res.body[0].category).to.be.an("object");
     expect(res.body[0].category.name).to.equal("Hardware");
+  });
+
+  it("Debería retornar un error 403 si el usuario no es propietario del producto", async function () {
+    // Registrar un nuevo usuario
+    await request(app).post("/auth/register").send({
+      email: "user@example.com",
+      password: "123456",
+    });
+
+    // Login con nuevo usuario
+    const login = await request(app).post("/auth/login").send({
+      email: "user@example.com",
+      password: "123456",
+    });
+
+    // console.log(login.status, login.body);
+
+    // Buscar un producto
+    const product = await Product.findOne();
+
+    // console.log(product);
+
+    // Modificar un producto con el método put
+    const updateProduct = {
+      name: "Nuevo Mouse",
+    };
+
+    const res = await request(app)
+      .put(`/products/${product.id}`)
+      .send({ updateProduct })
+      .set("Authorization", `Bearer ${login.body.token}`);
+
+    // console.log(res.status, res.body);
+
+    // Expect 403
+    expect(res.status).to.equal(403);
   });
 });

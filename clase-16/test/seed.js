@@ -78,4 +78,4 @@ export async function seedDatabase() {
   process.exit();
 }
 
-seedDatabase();
+// seedDatabase();
