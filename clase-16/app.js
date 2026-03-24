@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from "express";
 import "./db.js";
+import cors from "cors";
 
 import productsRouter from "./routes/products.router.js";
 import categoriesRouter from "./routes/categories.router.js";
@@ -12,6 +13,12 @@ import pingRouter from "./routes/ping.router.js";
 
 const app = express();
 
+// app.use(
+//   cors({
+//     origin: "http://127.0.0.1:5173",
+//   }),
+// );
+app.use(cors());
 app.use(express.json());
 
 // app.use("/products", authMiddleware, productsRouter);
